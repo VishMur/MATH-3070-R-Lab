@@ -1,0 +1,114 @@
+---
+title: "MATH 3070 Lab Project 2"
+author: "Vishwa Murugappan"
+date: "September 1, 2022"
+output:
+  html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+## Problem 1 (Verzani problem 1.7)
+
+*The `rivers` (**UsingR**) or any other data set is available after loading the package **UsingR**. Load the package, and inspect the data set. Scan the values to find the largest one.*
+
+The dataset is not available by default in R. The UsingR package must be imported to access it. The max() function can retrieve the largest value in the dataset.
+
+```{r}
+# Requires that the UsingR pakcage be installed. This is necessary to get the rivers data.
+require(UsingR)
+
+# Import data
+data(rivers)
+
+# Print 6 key values that descirbe the dataset and its spread
+cat("Dataset Inspection and Summary:","\n")
+summary(rivers)
+
+# Print maximum value in the dataset
+cat("\n", "Maximum is:", max(rivers))
+```
+
+## Problem 2 (Verzani problem 2.4)
+
+*Create the following sequences, using `:`, `seq()`, or `rep()` as appropriate:*
+
+1.  `"a" "a" "a" "a" "a" "a"`
+
+We want 6 a's in a row.
+
+```{r}
+# rep() allows you to repeat a string a specified amount of times
+rep("a",6)
+```
+
+2.  `1 3 ... 99` *(the odd numbers)*
+
+We want a sequence beginning with 1, ending with 99, and increasing in increments of 2.
+
+```{r}
+# seq() allows for a a sequence to be generated from one number to another one with a specified
+# amount of spacing
+seq(1, 99, 2)
+```
+
+3.  `1 1 1 2 2 2 3 3 3`
+
+We want a sequence going from 1 to 3 with each number being repeated 3 times.
+
+```{r}
+# rep() also has an optional "each" parameter that lets you pick a number of times you want a
+# value to show up before mvoing on to the next one
+rep(1:3, each = 3)
+```
+
+## Problem 3 (Verzani problem 2.3)
+
+*Let our small data set be* `2 5 4 10 8`.
+
+1.  *Enter this data into a data vector `x`.*
+
+Vectors are the result of a combinations of values, like the dataset presented earlier.
+
+```{r}
+# c() allows for values to be combined into a vector or list
+# We can make the dataset using it
+x <- c(2,5,4,10,8)
+```
+
+2.  *Find the square of each number.*
+
+We can raise the dataset to the power of 2.
+
+```{r}
+# When an operation is applied on a list, the operation is applied to all of its component
+# values
+x ^ 2
+```
+
+3.  *Subtract 6 from each number.*
+
+We can subtract 6 from the dataset.
+
+```{r}
+# Same as before
+# When an operation is applied on a list, the operation is applied to all of its component
+# values
+x - 6
+```
+
+4.  *Subtract 9 from each number and then square the answer.*
+
+We can subtract 9 from the dataset and then raise it to the power of 2.
+
+```{r}
+# Same as before; slightly more complicated operation
+# When an operation is applied on a list, the operation is applied to all of its component
+# values
+(x - 9) ^ 2
+```

@@ -1,0 +1,114 @@
+---
+title: "MATH 3070 Lab Project 11"
+author: "Vishwa Murugappan"
+date: "November 15, 2022"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+*Because randomization is used in this assignment, I set the seed here, in addition to beginning each code block. **Do not change the seed!***
+
+```{r}
+set.seed(6222016)
+```
+
+## Problem 1 (Verzani problem 7.1)
+
+*Simulate 1000 rolls of a pair of dice, and compute the sum of each pair. Which is more common, a roll of 7 or 8?*
+
+```{r, echo=FALSE}
+# Seed reset; DO NOT CHANGE THE SEED!
+set.seed(6222016)
+```
+
+```{r, tidy=TRUE}
+# The replicate() function will repeat the function as many times as given in the first
+# parameter. The two sample functions added together symbolize the sum of the rolls of the
+# two dice.
+pair_sums = replicate(1000, sample(1:6,1) + sample(1:6,1))
+# The table shows the number of each unique value in pair_sums.
+table(pair_sums)
+```
+
+From the table, it is clear that a roll of 7 is a more common result than a roll of 8. 175 7s were rolled and 133 8s were rolled.
+
+## Problem 2 (Verzani problem 7.2)
+
+*For the `rivers` data set, take 1000 random samples of size 10. Compare the mean of the sample means computed from these samples, with the sample mean of the data in `rivers`.*
+
+```{r, echo=FALSE}
+# Seed reset; DO NOT CHANGE THE SEED!
+set.seed(6222016)
+```
+
+```{r, tidy=TRUE}
+# The sample() function with the size parameter lets me pick a sample of size 10. Then the
+# mean() function is applied. The replicate() function lets me repeat the sampling and mean-
+# taking process 1000 times. The mean() function which all of this is wrapped around takes
+# the mean of the sample means.
+cat("Mean of sample means:", mean(replicate(1000, mean(sample(rivers, size = 10)))), "\n")
+# This is just a sample mean of the data provided. No sampling or replication is necessary
+# here. We are only using the data that was previously given.
+cat("Sample mean of data:", mean(rivers))
+```
+
+The mean of the sample means is slightly higher than the sample mean of the data.
+
+## Problem 3
+
+*The data set `Melanoma` (**MASS**) includes data for 205 Danish patients with malignant melanoma. The variable `time` describes survival time in days, and `sex` describes the sex of the patient. Does survival time differ between the sexes?*
+
+```{r, echo = FALSE}
+# MASS library required to run, but that will display unnecessary text. Thus, echo = FALSE is used for this cell to hide the output.
+require("MASS")
+```
+
+1.  *Find* $\bar{x}_{\text{men}} - \bar{x}_{\text{women}}$, the mean difference in survival time (`time`) between men and women (`sex`) in `Melanoma`.
+
+```{r, tidy = TRUE}
+# The subset() function lets us filter by sex (0 for men and 1 for women). Using the $ sign
+# lets us select the column we want (time).
+men_survival_times = subset(Melanoma, sex == 0)$time
+women_survival_times = subset(Melanoma, sex == 1)$time
+# Find the difference in means by subtracting the mean time of one sex from that of the
+# other.
+men_survival_time_difference = mean(men_survival_times) - mean(women_survival_times)
+men_survival_time_difference
+```
+
+Survival time differs between men and women. However, we have not seen yet whether the difference is significant.
+
+2\. *Investigate whether the difference you observed in part 1 is significant, using procedures explored in the lecture. There are two groups in this investigation: male (`Melanoma$sex == 0`) and female (`Melanoma$sex == 1`). Randomly reassign the data in the `time` variable to the two groups, and compute the mean difference. Repeat 2000 times (this needs to be done relatively quickly; if it takes over a few minutes, I will dock points), and determine how frequently the difference in the mean survival time between men and women (that is,* $\bar{x}_{\text{men}} - \bar{x}_{\text{women}}$ in the simulated data is less than the same difference observed in the actual data. Does this analysis suggest the difference is due to "noise", or due to an actual difference in survival time between men and women?
+
+```{r, echo=FALSE}
+# Seed reset; DO NOT CHANGE THE SEED!
+set.seed(6222016)
+```
+
+```{r, tidy=TRUE}
+# When curly brackets are used as parameters for the replicate function, everything inside the curly brackets is replicated for the defined number of times.
+survival_time_difference_shuffled_means = replicate(2000, {
+  # Using the sample function of the time data takes the data and rearragnes it in a random
+  # order by randomly picking values in the data (without replacement) until all the data has
+  # been picked.
+  Melanoma$shuffled_time = sample(Melanoma$time)
+  # Similar to what was done earlier, the times must be subsetted using sex.
+  men_shuffled_survival_times = subset(Melanoma, sex == 0)$shuffled_time
+  women_shuffled_survival_times = subset(Melanoma, sex == 1)$shuffled_time
+  # Find the difference in means by subtracting the mean time of one sex from that of the
+  # other.
+  mean(men_shuffled_survival_times) - mean(women_shuffled_survival_times)
+})
+# Find the number of shuffled mean differences that are greater than the true difference
+# in mean survival time between men and women then divide by 2000 (number of times the
+# process was repeated) to find the proportion of shuffled mean differences that are greater
+# than the true difference in mean survival time between genders.
+length(which(survival_time_difference_shuffled_means > men_survival_time_difference))/2000
+```
+
+1.85% of the mean survival time differences computed using the random shuffling method were higher than the mean different in survival time found earlier in the problem (using the data that was provided and not shuffled). Thus, the difference in survival time between men and women is likely significant and is not due to just "noise".

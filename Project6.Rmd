@@ -1,0 +1,77 @@
+---
+title: "MATH 3070 Lab Project 6"
+author: "Vishwa Murugappan"
+date: "October 5th, 2022"
+output:
+  html_document:
+    toc: TRUE
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+## Problem 1 (Verzani problem 5.1)
+
+*For the `UScereal` (**MASS**) data set, create a scatter plot of `calories` modeled by `sugars` using the `shelf` variable to create different plot characters. Add a legend to indicate the shelf number. Is there any patterns? (Use base R plotting for this problem.)*
+
+I will first look at the shelf column of the data set. We need this because we want to figure out what keys to use in the legend in the graph below.
+
+```{r}
+# From a previous lab, I remember that we can use the $ opertor to reference a single column in a data frame
+UScereal$shelf
+
+```
+
+From the code above, it is clear that there are 3 different shelves that all the items are housed on.
+
+```{r, tidy=TRUE, error=TRUE}
+# Make sure the required package (to access the dataset) is installed
+library(MASS)
+
+with(UScereal, plot(sugars,calories, col = shelf, pch = shelf))
+
+legend(
+  # The first two arguments are the coordinates of the legend on the plot
+  18.2, 460,
+  # The next argument is the keys in the legend (corresponding to which shelf each item is located on)
+  c("Shelf 1", "Shelf 2", "Shelf 3"),
+  # The colors used for encoding
+  col = 1:3,
+  # The icons used for encoding
+  pch = 1:3
+)
+```
+
+The sugars and calories of the items on the third shelf seem to have a weak linear relationship. The sugars and calories of the items on the first and second shelves do not seem to have any correlation.
+
+## Problem 2 (Verzani problem 5.3)
+
+*For the data set `UScereal` (**MASS**) make a pairs plot of the numeric variables. Which correlation looks larger: fat and calories or fat and sugars?*
+
+```{r, tidy=TRUE, error=TRUE}
+# Save current par settings
+old_par <- par()
+# Change par settings to allow for two plots side by side
+par(mfrow = c(1, 2))
+# Left plot
+with(UScereal, plot(calories ~ fat))
+# Right plot
+with(UScereal, plot(sugars ~ fat))
+```
+
+The fat and calories correlation looks larger than the fat and sugars correlation because the fat and calories relationship appears to be more linear.
+
+## Problem 3 (Verzani problem 5.4)
+
+*For the data set `batting` (**UsingR**) make a bubble plot of home runs hit (`HR`) modeled by hits (`H`) where the scale factor for each point is given by `sqrt(SO)/10`. Is there any story to be told by the size of the points? (You must use base R plotting for this problem.)*
+
+```{r, tidy=TRUE, error=TRUE}
+# Make sure the required package (to access the dataset) is installed
+library(UsingR)
+
+# Plot function used in a similar fashion as before, but cex parameter allows me to control the dot size
+plot(HR ~ H, data = batting, pch = 16, col = rgb(red = 0, green = 0, blue = 0, alpha = 0.33), cex = sqrt(SO)/10)
+```
+
+The size of the dots is important because, if the dots were too small, we would not be able to see them, and the graph would be pointless. Conversely, if they were too large, they would overlap a lot, the entire plot would become black, and we would not be able to get any useful information out of it. With the current size, it is possible to see individual points, as well as notice where there are clusters of points (dark areas).
+
+Additionally, the size of each dot is not constant; rather, it depends on the SO score for each player (given in the batting data frame). This means that, in addition to viewing the H and HR values graphed against each other on the plot, we can also see SO scores. Thus, by using the "cex" parameter in plot() cleverly, we have added a third piece of the data in the batting data set to the graph.

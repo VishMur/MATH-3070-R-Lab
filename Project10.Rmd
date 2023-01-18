@@ -1,0 +1,147 @@
+---
+title: "MATH 3070 Lab Project 10"
+author: "Vishwa Murugappan"
+date: "November 9, 2022"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+*Since this assignment involves simulation, I set the seed to the following in order to get the same results:*
+
+```{r}
+set.seed(5292016)
+```
+
+## Problem 1 (Verzani problem 6.2)
+
+*Roll a pair of dice. Let* $X$ be the largest value shown on the two dice. Use `sample()` to simulate five values of $X$.
+
+```{r, echo=FALSE}
+# This code block resets the random seed in order to get consistent results. This will be
+# hidden in the final document, but YOU MUST NOT CHANGE THIS!
+set.seed(5292016)
+```
+
+```{r, error=TRUE, tidy=TRUE}
+# Simulation must repeat 5 times (so we create a counter variable and create a repeat loop)
+counter = 1
+repeat{
+  # All values on a dice have equal likelihood of occuring, so we can just use the sample()
+  # function to pick a number between 1 and 6, inclusive without adjusting from the default
+  # "prob" paramter in the function
+  dice1 = sample(1:6,1)
+  dice2 = sample(1:6,1)
+  
+  # Print X value (given by the maximum value of the two dice rolls)
+  cat("X value:", max(dice1,dice2), "\n")
+  
+  # Increment the counter
+  counter = counter + 1
+  
+  # Exit condition
+  if (counter == 6){
+    # Exit the repeat loop
+    break
+  }
+}
+```
+
+## Problem 2 (Verzani problem 6.3)
+
+*The National Basketball Association lottery to award the first pick in the draft is held by putting 1,000 balls into a hopper and selecting one. The teams with the worst records the previous year have a greater proportion of the balls. The data set `nba.draft` (**UsingR**) contains the ball allocation for the year 2002. Use `sample()` with Team as the data vector and `prob=Balls` to simulate the draft. What team do you select? Repeat until Golden State is chosen. How long did it take?*
+
+```{r, message = FALSE}
+# This code needs to run but should not be displayed in the knitted pdf. So we create a 
+# separate cell to run this code and give it message = FALSE for it to not print anything.
+require(UsingR)
+```
+
+```{r, echo=FALSE}
+# This code block resets the random seed in order to get consistent results. This will be hidden in the final document, but YOU MUST NOT CHANGE THIS!
+set.seed(5292016)
+```
+
+```{r, error=TRUE, tidy=TRUE}
+# The sample function here is being used here again, but probability weights have been
+# adjusted this time to account for the fact that worse teams have a higher probability of
+# being chosen to pick earlier in the draft
+draft_simulation = sample(nba.draft$Team, prob = nba.draft$Balls, size = 4)
+draft_simulation
+```
+
+Chicago was selected first (as indicated by the fact that its name was shown first in the results of the draft simulation). I kept picking teams until Golden State was picked; it was the 4th pick.
+
+## Problem 3 (Verzani problem 6.23)
+
+*Find the quintiles (*$0^{\text{th}}$, $20^{\text{th}}$, $40^{\text{th}}$, $60^{\text{th}}$, $80^{\text{th}}$, and $100^{\text{th}}$ quantiles/percentiles) of the standard Normal distribution (this is a normal distribution with mean 0 and standard deviation 1).
+
+```{r, error=TRUE, tidy=TRUE}
+# Create an evenly spaced number sequence
+number_sequence = seq(0, 10, length = 1000)
+# Create a normal distribution with mean = 0 and standard deviation = 1 from those numbers
+standard_norm_dist = dnorm(number_sequence, mean = 0, sd = 1)
+# print the quintiles
+cat(quantile(standard_norm_dist, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1)))
+```
+
+## Problem 4
+
+*Consider flipping a fair coin* $n$ times and counting the number of time the coin lands heads-up. This is a binomial random variable, but it turns out that as $n$ gets large, this distribution can be approximated with a Normal distribution, where the mean is $0.5 \times n$ and the standard deviation is $0.5 \times \sqrt{n}$. We know this thanks to the central limit theorem. When flipping 3, 5, and 20 times, plot the pmf of the binomial random variable with the appropriate parameters (you may use my function `plot_pmf()` from the lecture notes). Superimpose on each of these plots the density curve of the Normal distribution with the appropriate parameters (use the `lines()` function to do so; an example for doing this is in the lecture notes). What do you notice? When does the approximation appear best?
+
+```{r, error=TRUE, tidy=TRUE}
+# This function was already provided with the lecture
+plot_pmf <- function(q, p) {
+    # This will plot a series of horizontal lines at q with height p, setting
+    # the y limits to a reasonable heights
+    plot(q, p, type = "h", xlab = "x", ylab = "probability", main = "pmf", ylim = c(0, 
+        max(p) + 0.1))
+    # Usually these plots have a dot at the end of the line; the point function
+    # will add these dots to the plot created above
+    points(q, p, pch = 16, cex = 2)
+}
+```
+
+```{r, error=TRUE, tidy=TRUE}
+# Note: This could have been done using a for loop and much less lines of code, but I think
+# you said not to use for loops in a previous lab, so I did it without a for loop. While
+# there are more lines of code now, the runtime would be the same whether a for loop was used
+# or not, so I don't think I made this code inefficient
+
+# Create 3 coin simulation and plot pmf
+n = 3
+heads_q = seq(0,n)
+heads_pmf = dnorm(heads_q, mean=n/2, sd=(sqrt(n)/2))
+plot_pmf(heads_q, heads_pmf)
+# Plot normal distribution on top of pmf
+heads_q_1k_samples <- seq(0, n, length = 1000)
+lines(heads_q_1k_samples, dnorm(heads_q_1k_samples, mean=n/2, sd=(sqrt(n)/2)), col = "green")
+```
+
+```{r, error=TRUE, tidy=TRUE}
+# Create 5 coin simulation
+n = 5
+heads_q = seq(0,n)
+heads_pmf = dnorm(heads_q, mean=n/2, sd=(sqrt(n)/2))
+plot_pmf(heads_q, heads_pmf)
+# Plot normal distribution on top of pmf
+heads_q_1k_samples <- seq(0, n, length = 1000)
+lines(heads_q_1k_samples, dnorm(heads_q_1k_samples, mean=n/2, sd=(sqrt(n)/2)), col = "green")
+```
+
+```{r, error=TRUE, tidy=TRUE}
+# Create 20 coin simulation
+n = 20
+heads_q = seq(0,n)
+heads_pmf = dnorm(heads_q, mean=n/2, sd=(sqrt(n)/2))
+plot_pmf(heads_q, heads_pmf)
+# Plot normal distribution on top of pmf
+heads_q_1k_samples <- seq(0, n, length = 1000)
+lines(heads_q_1k_samples, dnorm(heads_q_1k_samples, mean=n/2, sd=(sqrt(n)/2)), col = "green")
+```
+
+The approximation appears the best in the 20 coin simulation. This makes sense because the central limit theorem states that, as sample size increases, the closer to a normal distribution the simulation will become. Thus, the 20 coin simulation looks more normally distributed than the 5 coin simulation, and the 5 coin simulation looks more normally distributed than the 3 coin simulation.

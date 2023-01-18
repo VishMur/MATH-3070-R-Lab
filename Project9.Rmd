@@ -1,0 +1,98 @@
+---
+title: "MATH 3070 Lab Project 9"
+author: "Vishwa Murugappan"
+date: "November 2nd, 2022"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+## Problem 1 (Verzani problem 3.17)
+
+*The `state.x77` data set contains various information for each of the fifty United States. We wish to explore possible relationships among the variables. First, we make the data set easier to work with by turning it into a data frame.*
+
+```{r}
+x77 <- data.frame(state.x77)
+```
+
+*Now, make scatter plots of `Population` and `Frost`; `Population` and `Murder`; `Population` and `Area`; and `Income` and `HS.Grad`. Do any relationships appear linear? Are there any surprising correlations?*
+
+```{r, tidy=TRUE}
+# First basic plots were made for each variable
+# Then, correlations were computed and displayed
+# Finally, titles were created based on the computed correlations and the graphs were shown
+
+plot(Population ~ Frost, data = x77)
+pop_frost_corr = cor(x77$Population, x77$Frost)
+pop_frost_corr
+title(main = "r = -0.332")
+
+plot(Population ~ Murder, data = x77)
+pop_murder_corr = cor(x77$Population, x77$Murder)
+pop_murder_corr
+title(main = "r = 0.344")
+
+plot(Population ~ Area, data = x77)
+pop_area_corr = cor(x77$Population, x77$Area)
+pop_area_corr
+title(main = "r = 0.0225")
+
+plot(Income ~ HS.Grad, data = x77)
+income_hsgrad_corr = cor(x77$Income, x77$HS.Grad)
+income_hsgrad_corr
+title(main = "r = 0.62")
+```
+
+Correlations were computed and displayed in a separate window before the plots were. Plots were titled with the correlation values computed. All but the Area v. Population correlation appear somewhat linear, with the HS.Grad v. Income plot having the most linear-looking relationship. Also, Frost v. Population appears negatively correlated, while Population v. Murder and HS.Grad v. Income appearing positively correlated.
+
+The r values computed reflected the qualitative observations made above, meaning that there were not surprising results. Frost v. Population has an r value of -0.332, indicating an inverse relationship between the two variables. Population v. Murder and HS.Grad v. Income are positively correlated, with r values of 0.344 and 0.62, respectively. Finally, Area and Population have a near-zero correlation (specifically r = 0.0225).
+
+## Problem 2 (Verzani problem 3.20)
+
+*The `batting` (**UsingR**) data set contains baseball statistics for the 2002 Major League Baseball season. What is the correlation between the number of strikeouts (`SO`) and the number of home runs (`HR`)? Make a scatter plot to see whether there is any trend. Does the data suggest that in order to hit a lot of home runs one should strike out a lot?*
+
+```{r, message = FALSE}
+# This code needs to run but should not be displayed in the knitted pdf. So we create a 
+# separate cell to run this code and give it message = FALSE for it to not print anything.
+require(UsingR)
+```
+
+```{r, tidy=TRUE}
+# Basic plot
+plot(SO ~ HR, data = batting)
+# Creating and printing correlation between HR and SO
+SO_HR_corr = cor(batting$HR, batting$SO)
+SO_HR_corr
+# Creating a trendline for graph
+abline(lm(batting$SO~batting$HR), col = 'green')
+# Labelling the graph with r value as title
+title(main = "r = 0.708")
+```
+
+While the data and the trend line graphed indicate that there is a correlation between home runs hit and strike outs, this DOES NOT IMPLY causation. Thus, it can not be construed that the data suggest that in order to hit a lot of home runs, one should strike out a lot. A potential explanation for this trend is that an increase in the number of hits attempted leads to increases in both strike outs and home runs for players.
+
+## Problem 3 (Verzani problem 3.32)
+
+*The data set `UScereal` (**MASS**) contains information about cereals on a shelf of a United States grocery store. Make a table showing the relationship between manufacturer, `mfr`, and shelf placement, `shelf`. Are there any obvious differences between manufacturers?*
+
+```{r, tidy=TRUE}
+# xtabs() creates tables of variables in datasets
+manufacturer_shelf_table <- xtabs(~ mfr + shelf, data = UScereal)
+manufacturer_shelf_table
+```
+
+Manufacturers G and K have the far more products on shelves than other companies. While manufacturer P has less products on shelves than G and K, it has more than manufacturers N, Q, and R do.
+
+## Problem 4 (Verzani problem 3.33)
+
+*The help page for `mosaicplot()` demonstrates the data set `HairEyeColor`, which records `sex`, `Hair` color, and `Eye` color for 592 statistics students. The data set comes as a flattened table, so simply passing the object to `mosaicplot()` will create the plot. (Or, as demonstrated, passing `shade = TRUE`, as in `mosaicplot(HairEyeColor, shade = TRUE)`, will produce a colored version.)* *Make the plot. Why does the help page note, "there are more blue-eyed, blonde females than expected?"*
+
+```{r, tidy=TRUE}
+# mosaicplot() will plot mosaics of datasets. Shade = TRUE allows for color to be shown for the residuals in the mosaic plot
+mosaicplot(HairEyeColor, shade = TRUE)
+
+```
+
+Colors show residuals (which can represent the distance from mean or expected value that data are). Because the blue-eyed blond female box is so blue, that indicates that the residual is greater than 4 and the sample has much more blue-eyed blond women than expected.

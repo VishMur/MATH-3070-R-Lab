@@ -1,0 +1,67 @@
+---
+title: "MATH 3070 Lab Project 1"
+author: "Vishwa Murugappan"
+output:
+  html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+*Note: The dollar signs, back slashes, frac, etc. are all part of the typesetting language* $\LaTeX$. They are used to create good-looking equations upon the knit. However, they are not R code. Thus the goal of this problem is to essentially translate from $\LaTeX$ to R. `frac` will need to be replaced with the usual divide sign, for example
+
+## Problem 1 (Verzani problem 1.1)
+
+*Use R as you would a calculator to find numeric answers to the following:*
+
+1.  $1 + 2(3 + 4)$
+
+***I used R as a calculator to solve the math problem below.***
+
+```{r}
+# This problem requires the usage of the multiplication and addition operators.
+1 + 2*(3 + 4)
+```
+
+2.  $4^3 + 3^{2 + 1}$
+
+***I used R as a calculator to solve the math problem below.***
+
+```{r}
+# This problem requires the usage of the multiplication, addition, and caret (exponent) operators.
+4^3 + 3^(2 + 1)
+```
+
+## Problem 2 (Verzani problem 1.4)
+
+*Use R to compute the following:*
+
+$$\frac{0.25 - 0.2}{\sqrt{0.2(1-0.2)/100}}$$
+
+***This Problem is more difficult than the previous ones because it requires you to figure out how to represent square roots in R code.***
+
+```{r}
+# I used R as a calculator to solve the math problem above.
+# I noticed that sqrt() is the function that is used in R to take a square root.
+(0.25 - 0.2)/sqrt((0.2*(1-0.2)/100))
+```
+
+## Problem 3 (Verzani problem 1.5)
+
+*Assign the numbers 2 through 5 to different variables, then use the variables to multiply all the values.*
+
+***Defined variables in R can be multiplied the same way as numbers.***
+
+```{r}
+# I used '<-' to assign values to all the variables.
+# Then, I used the multiplication operator to multiple all of them together.
+two <- 2
+three <- 3
+four <- 4
+five <- 5
+two * three * four * five
+```

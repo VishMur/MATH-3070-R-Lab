@@ -1,0 +1,113 @@
+---
+title: "MATH 3070 Lab Project 7"
+author: "Vishwa Murugappan"
+date: "October 19th, 2022"
+output:
+  html_document:
+    toc: TRUE
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+## Problem 1 (Verzani problem 5.6)
+
+*For the `batting` (**UsingR**) data set, make parallel boxplots of the batting average (`H/AB`) for each team. Which team had the greatest median average? (Use **lattice** functions for this problem.)*
+
+```{r, tidy=TRUE, error=TRUE}
+# Importing necessary libraries for the rest of the project
+library(UsingR)
+library(lattice)
+library(ggplot2)
+```
+
+```{r, tidy=TRUE, error=TRUE}
+# bwplot() is the lattice function to create a box and whisker plot
+# The first parameter gives the x values to plot (H/AB) and the teamID labels to plot for
+bwplot( ~ H/AB | teamID, data = batting)
+```
+
+LAN has the greatest median average because the black dot on LAN has the largest value out of all the black dots.
+
+## Problem 2 (Verzani problem 5.7)
+
+*For the `mtcars` data set, produce graphics of the following using **ggplot2**:*
+
+1.  *Boxplots for miles per gallon (`mpg`) for groups defined by the number of gears (`gear`).*
+
+```{r, tidy=TRUE, error=TRUE}
+# ggplot always starts with data and an aesthetic parameter, then additional features can be added to change the plot
+# Here, geom_boxplot() was used to create boxplots of MPG for each gear
+ggplot(data = mtcars, aes(x = as.character(gear), y = mpg)) + 
+  geom_boxplot() + 
+  xlab("# of Gears") + 
+  ylab("MPG")
+```
+
+2\. *A scatterplot of `mpg` modeled by horsepower (`hp`). Create facets by the number of cylinders (`cyl`) and `gear`.*
+
+```{r, tidy=TRUE, error=TRUE}
+# geom_point is ggplots way of creating scatter plots
+# facet grid makes it so that different horsepower and mpg values can be shown in different scatter plots
+ggplot(mtcars, aes(x = hp, y = mpg)) + 
+  geom_point() + 
+  facet_grid(gear ~ cyl)
+```
+
+## Problem 3
+
+*Using the `batting` data set (UsingR), create a visualization that does the following:*
+
+-   *Plots the* rate *of intentional walks (that is, the number of intentional walks divided by the number of times a player was at bat; these are the `IBB` and `AB` variables in the data set, respectively) against the* rate *of home runs (the `HR` variable in the data set) as a scatterplot*
+
+-   *Draws a trend line for these variables*
+
+-   *Identifies and labels the outlier in the data set in these variables (easily spotted once the scatter plot is drawn)*
+
+*(Hint: `geom`-type functions can accept data arguments and will use the data set passed rather than the default for the chart. So for the third requirement, consider adding a text layer with `geom_text(data = ..., aes(...))` where the argument passed to `data` is a subset of the data set consisting of the outlier, and `aes(...)` defines how to label that outlier.)*
+
+```{r, tidy = TRUE, error=TRUE}
+# geom_smooth creates a line modelling the relationship between the two variables
+# the label ifelse() in the aes() function labells the outliers (all four of them have HR values of more than 45). The empty quotes are the labels for the non-outliers
+# geom_text allows the labels created earlier to be shown
+ggplot(batting, aes(x = IBB/AB, y = HR, label = ifelse(HR > 45, HR, ""))) +
+  geom_point() +
+  geom_smooth(method=lm) +
+  geom_text(vjust = -0.45) +
+  xlab("Intentional Walk Rate") +
+  ylab("Home Runs") +
+  ggtitle("Baseball Home Runs Plotted Against Intentional Walk Rate")
+```
+
+I decided that the four outliers were outliers because they were significantly far away from the other points that they deserved that designation.
+
+## BONUS Problem
+
+*Reconsider the data set from a previous project containing data about the results of 2012 Olympics. I load the data in for you below:*
+
+```{r}
+setwd("~/Downloads")
+
+olympic2012 <- read.csv("http://introcs.cs.princeton.edu/java/data/olympic-medals2012.csv")
+
+olympic2012 <- transform(olympic2012, GDP.2011 = as.numeric(gsub(",", "", GDP.2011)), pop.2010 = as.numeric(gsub(",", "", pop.2010)))
+olympic2012
+```
+
+*Use any plotting system (base R, **lattice**, **ggplot2**) to create plot involving at least three variables in the `olympic2012` data set. Explain the relationship you explored and any interesting findings. **Bonus points will be given for plots that I consider exceptionally clean, clear, and insightful, accompanied with good analyses of what you found.***
+
+```{r, tidy=TRUE, error=TRUE}
+# The geom_smooth formula has been changed for this graph. While a line was used earlier, not it has been changed to a second degree polynomial
+# This was done by using the formula parameter in the geom_smooth function
+ggplot(data = olympic2012, aes(x = Team.size.rank, y = Total, color = Athlete.rank.score)) +
+  geom_point() + 
+  geom_smooth(method="lm", linetype = "dashed", formula = y ~ poly(x,2), color = "#F1B3A6") +
+  xlab("Team Size Score (of each country)") +
+  ylab("Total Medals Won in 2012 Olympics (for each country)") +
+  theme(axis.title = element_text(size = 10))
+```
+
+This plot is of total medals won in the 2012 Olympics per country modeled by the team size rank. The colors of the points are provided by the athlete rank score. It is important to note that the team size score is inversely proportional to how good a country's team is.
+
+The trend line models the relationship between the total medals won in the 2012 Olympics per country and the team size rank using a second degree polynomial. This line shows that as the team size rank increases (which means that as the teams get worse), the total medals won in a country decreases. This makes sense, as one can reasonably infer that worse teams will get less medals.
+
+The athlete rank score is a score that ranks the overall skill level of athletes in each country. The lighter the shade of blue a dot is the higher its athlete rank score. The team size score and the athlete rank score are inversely proportional because as the team size score increases (as the teams get worse), the athlete rank score decreases. The athlete rank score is directly proportional to the total medals won because as one increases, so does the other.

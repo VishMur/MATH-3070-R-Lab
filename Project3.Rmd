@@ -1,0 +1,113 @@
+---
+title: "MATH 3070 Lab Project 3"
+author: "Vishwa Murugappan"
+date: "September 8, 2022"
+output:
+  html_document:
+    toc: TRUE
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+## Problem 1
+
+*The `faithful` (Package **datasets** is built in Base R) dataset records the waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park. Find the mean waiting time, median waiting time, longest waiting time and shortest waiting time in minutes.*
+
+R has the mean(), median(), max(), and min() functions to compute these values.
+
+```{r}
+# The $ sign can be used to reference a column inside a dataset.
+cat("mean waiting time:", mean(faithful$waiting), "\n")
+cat("median waiting time:", median(faithful$waiting), "\n")
+cat("max waiting time:", max(faithful$waiting), "\n")
+cat("min waiting time:", min(faithful$waiting))
+```
+
+## Problem 2 (Verzani problem 2.34)
+
+*The data set `DDT` (**MASS**) contains independent measurements of the pesticide DDT on kale. Make a histogram and a boxplot of the data. From these, estimate the mean and standard deviation. Check your answers with the appropriate functions.*
+
+R has the hist() and boxplot() functions to do these
+
+```{r}
+# MASS must be installed first to see the DDT dataset
+library(MASS)
+hist(DDT)
+boxplot(DDT)
+```
+
+For the mean, we can look at the bold line on the box plot. Thus, the mean is 3.2.
+
+For the standard deviation, we can look at box plot and the histogram. From the box plot, there is 1 outlier, which we define as any number that falls more than 1.5 standard deviations away from the mean. Thus, if we take the range of the data (excluding the 1 outlier value), then divide by 3 (1.5\*2), we should have an estimate for a standard deviation. Next, we can look at the histogram. The outlier value is clearly between 4.5-5.0. Thus, the maximum range we want is from 4 to 2.5 and from 3.5 to 3. (4-2.5) divided by 3 yields 0.5, and (3.5-3) divided by 3 yields 0.167. Thus, the standard deviation should be between 0.167 and 0.5.
+
+To check my predictions, I will use the mean() and sd() functions.
+
+```{r}
+cat("mean DDT measurement:", mean(DDT), "\n")
+cat("standard deviation of DDT measurement:", sd(DDT))
+```
+
+## Problem 3 (Verzani problem 2.32 modified)
+
+*Write a function 'density_compare()' that fits a density estimate to a given data set and plots that estimate along with the appropriate histogram of the given data set. Try your function with the data set `pi2000` (**UsingR**). Why might you want to add an argument like `breaks = 0:10-.5` to `hist()`? (Hint: read the documentation of `hist()` to see what setting this argument does). Feel free to add other parameters to your plot methods to see how they can be changed.*
+
+lines() can be used to draw lines on top of a histogram in R
+
+```{r}
+density_compare <- function(dataset) {
+  # breaks parameter added to change the range of each box on the histogram
+  hist(dataset, breaks = 0:10-.5, freq = FALSE)
+  lines(density(dataset))
+}
+```
+
+```{r}
+library(UsingR)
+density_compare(pi2000)
+```
+
+Manually setting the breaks parameter allows you to adjust the number of bins and their x-axis width, if you desire.
+
+## BONUS (Verzani problem 2.25)
+
+*Write a function `isprime()` that checks if a number* $x$ is prime by dividing $x$ by all the values in $2, ..., x - 1$ then checking to see if there is a remainder of 0. The expression `a %% b` returns the remainder of `a` divided by `b`.
+
+```{r}
+isprime <- function(x) {
+  
+  for (divisor in 2:(x-1)) {
+    if (x %% divisor == 0) {
+      return(FALSE)
+    }
+    
+  }
+  
+  return(TRUE)
+  
+}
+
+isprime(13)
+```
+
+*You do not need to check all numbers from 2 to* $x - 1$ to see if a number is prime. What is the largest you would need to go for an arbitrary $x$? Create a new function, `isprime2()`, that implements this better (yet still slow) method.
+
+Check up to the square root of the number. That is enough.
+
+```{r}
+isprime2 <- function(x) {
+  
+  max_to_check = trunc(sqrt(x))
+  
+  for (divisor in 2:(max_to_check)) {
+    if (x %% divisor == 0) {
+      return(FALSE)
+    }
+    
+  }
+  
+  return(TRUE)
+  
+}
+
+isprime2(13)
+```

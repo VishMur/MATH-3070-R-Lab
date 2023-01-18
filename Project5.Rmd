@@ -1,0 +1,102 @@
+---
+title: "MATH 3070 Lab Project 5"
+author: "Vishwa Murugappan"
+date: "September 26, 2022"
+output:
+  html_document:
+    toc: TRUE
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+The MASS package will be necessary to do the homework.
+
+```{r, tidy=TRUE, error=TRUE}
+# usaPacakge() allows me to import packages in R.
+usePackage("MASS")
+```
+
+## Problem 1 (Verzani problem 4.7)
+
+*Use the `subset()` function to return a data frame made from the `Cars93` (**MASS**) data frame consisting only of `non-USA` cars in origin, with 4 cylinders and a maximum price of \$15,000 or less.*
+
+```{r, tidy=TRUE,error=TRUE}
+# The subset function allows me to take a subset of a dataset, with some filter(s)
+# The first parameter specifies the dataset (Cars93)
+# The second parameter specifies the filter(s) that I want to use
+  # I will filter so that the origin must not be USA, there must be 4 cylinders, and the
+  # maximum price must be less than or equal to 15 (prices are given in thousands)
+subset(Cars93, Origin == "non-USA" & Cylinders == 4 & Max.Price <= 15)
+```
+
+This process filtered the original data frame.
+
+## Problem 2 (Verzani problem 4.10)
+
+*Find the standard deviation of each variable in the `mtcars` data set.*
+
+```{r, tidy=TRUE, error=TRUE}
+# The sapply() function allows me to apply a function over a vector
+# Since, each column in an R dataframe is a vector, I can use sapply() to apply a sd()
+# function on them all
+# I can use an anonymous function to take the standard deviation of a column
+# Finally, a for loop will allow me to repeat this process for every column in the data frame
+for (colname in colnames(mtcars)) {
+  print(sapply(mtcars[colname], \(x) sd(x)))
+  cat("\n")
+}
+```
+
+The results of the code are the standard deviations of each variable in the mtcars data frame.
+
+## Problem 3 (Verzani problem 4.11)
+
+*Find the standard deviation for each numeric variable in `Cars93` (**MASS**).*
+
+```{r, tidy=TRUE, error=TRUE}
+# First, we must filter the columns of Cars93 by whether they are numeric.
+# We can doing this by using sapply() to apply the is.numeric function to each column
+Cars93IsNumeric <- Cars93[, sapply(Cars93,is.numeric)]
+# From there, this is the same problem as the last one, with one exception
+# Note that some of the standard deviations are computed to be NA
+# Upon inspection of the data set, this is because certain values in the columns are NA
+# I can just drop all the observations that include NA values using the na.omit() function
+# while applying the sd() function
+for (colname in colnames(Cars93IsNumeric)) {
+  print(sapply(Cars93IsNumeric[colname], function(x) sd(na.omit(x))))
+  cat("\n")
+}
+```
+
+This question combined the previous two questions because it forced me to both filter the data set and take the standard deviation of each variable in the (filtered) data frame.
+
+## Problem 4
+
+*You can find data describing various statistics on 2012 Olympic participating nations such as population and medal counts in the comma-separated value file (olympic-medals2012.csv). Load this dataset into R in a data frame and do the following:*
+
+1.  *Create a new data frame containing only the country's ISO code (a three-letter code for the country; USA is the United States of America, and DZA Algeria), name, population, and counts for gold, silver, and bronze. This data frame should be called `olympic2012`.*
+
+```{r, tidy=TRUE, error=TRUE}
+# I can read in the csv file from the link provided on Canvas
+olympic2012 = read.csv('http://introcs.cs.princeton.edu/java/data/olympic-medals2012.csv')
+# I can take the columns I want by simply making a vector of them and passing them through
+# square brackets outside of the data frame
+olympic2012 = olympic2012[c("ISO","Country.name","pop.2010","Gold","Silver","Bronze")]
+olympic2012
+
+```
+
+R gives me multiple ways to filter data frames. I showed how to use subset() to do this earlier, but I just used a vector of column names this time.
+
+2.  *What proportion of countries earned no medals? Answer this using `olympic2012`.*
+
+```{r, tidy=TRUE, error=TRUE}
+# The with() function will allow me to perform operations on columns in a data frame
+# I will add the Gold, Silver, and Bronze values together for each country
+# I will then check if the total is 0 and get True/False values for this operation
+# Finally, since R treats True and False as 1s and 0s, respectively, taking the mean will
+# give me the proportion of countries that earned 0 medals.
+mean(with(olympic2012, Gold + Silver + Bronze) == 0)
+```
+
+This question demonstrates the power of the with() function in R.

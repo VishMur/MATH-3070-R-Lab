@@ -1,0 +1,110 @@
+---
+title: "MATH 3070 Lab Project 12"
+author: "Vishwa Murugappan"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+```{r, message = FALSE, echo = FALSE}
+require("Hmisc")
+require("UsingR")
+```
+
+## Problem 1 (Verzani problem 8.7)
+
+*Of the last ten times you've dropped your toast, it landed sticky-side down nine times. If these are a random sample from the* $\text{Ber}(p)$ distribution, find an 80% confidence interval for $p$, the probability of the stidy side landing down. (Use `binconf()` (**Hmisc**) to compute the score interval.)
+
+```{r, tidy = TRUE}
+# Because we assume that the results are a random sample from a Bernoulli RV, we can use the
+# binconf() function with the appropraite alpha and method parameters to compute a confidence
+# interval for the probability of the sticky side landing down.
+# Since we want an 80% CI, we find that alpha = 1 - 0.8 = 0.2.
+# The relevant method is the wilson method.
+
+binconf(9, 10, alpha = 0.2, method = 'wilson')
+```
+
+## Problem 2 (Verzani problem 8.10)
+
+*A survey is taken of 250 students, and a* $\hat{p}$ of 0.45 is found. The same survey is repeated with 1000 students, and the same $\hat{p}$ is found. Compare the two 95% confidence intervals. What is the relationship? Is the margin of error for the second one four times smaller? If not, how much smaller is it? (Use `binom.test()` to answer this problem.)
+
+```{r, tidy = TRUE}
+# binom.test() supports the exact confidence interval (it uses the CDF of the binomial
+# distribution instead of a normal approximation). Using this function is important because
+# we want to conpare two small confidence intervals (by using their margins of error).
+
+# We must round number of successess for the 250 student sample because 250*0.45 is not an
+# integer.
+binom.test(round(250*0.45),250)
+
+binom.test(1000*0.45,1000)
+```
+
+For the 250 student sample, the margin of error is (0.5119484 - 0.3852992)/2 = 0.0633. For the 1000 student sample, the margin of error is (0.4814435 - 0.4188517)/2 = 0.0313. The margin of error for the latter sample is about 2 times as small as the one for the former sample.
+
+## Problem 3 (Verzani problem 8.15)
+
+*The `stud.recs` (**UsingR**) data set contains a sample of math SAT scores from some population in the variable `sat.m`. Find a 90% confidence interval for the mean math SAT score for this data. (Do not use \`t.test(); find this confidence interval "by hand".)*
+
+```{r, tidy = TRUE}
+# First, get relevant data from the stud.recs dataframe.
+scores = stud.recs$sat.m
+
+# Compute sample mean.
+xbar = mean(scores)
+
+# Compute sample standard deviation.
+sigma = sd(scores)
+
+# Compute critical value for 90% CI. The lower.tail parameter must be false or else the
+# confidence intervals will be backwards.
+zstar = qnorm(0.05, lower.tail = FALSE)
+
+# Plug values computed above into the formula to compute margin of error.
+moe = zstar * sigma/sqrt(length(scores))
+
+# Subtract margin of error from xbar and Add margin of error to xbar to get lower and upper
+# confidence bounds, respectively.
+ci = c(Lower = xbar - moe, Upper = xbar + moe)
+
+# Print out the confidence interval.
+ci
+```
+
+## Problem 4 (Verzani problem 8.15)
+
+*For the `homedata` (**UsingR**) data set find 90% confidence intervals for both variables `y1970` and `y2000`, assuming the sample represents some population. Perform one sample t-test for each variable, use `t.test()`, but first discuss whether the model assumptions are appropriate (include some check of the assumptions, like a Q-Q plot).*
+
+```{r, tidy = TRUE}
+# t-tests assume that the data they are being performed upon are approximately normally
+# distributed. To check this, the y1970 and y2000 variables can be graphs on a Q-Q plot. If
+# the qqnorm() of the data approximately follows the qqline, then the data is approximately
+# normally distributed.
+
+qqnorm(homedata$y1970, main = "Normal Q-Q Plot (y1970)")
+qqline(homedata$y1970)
+
+qqnorm(homedata$y2000, main = "Normal Q-Q Plot (y2000)")
+qqline(homedata$y2000)
+```
+
+In order to use the t.test() function, we need to see if the data we would be applying it to is approximately normally distributed because normally distributed data is one of the assumptions made when creating confidence intervals using t distribution-based methods. The Q-Q plots made of both the y1970 and y2000 variables show that neither variable has a normal distribution.
+
+For y1970, the qqnorm plot diverges from the qqline at around the 100000 sample quantile mark, and the data has multiple outliers. Similarly, the y2000 qqnorm plot diverges from its qqline at both extremes of the spectrum (when sample quantile is near 0 and above 700000), and the data has multiple outliers.
+
+However, the t.test() function will still be used to generate confidence intervals because it is fairly robust even if the data is not distributed normally.
+
+```{r, tidy = TRUE}
+# After the Q-Q plots were analyzed, we can now compute the 90% CI intervals for both the
+# y1970 and y2000 variables using t.test(). The confidence level can be passed in via the
+# conf.level parameter (0.9 in this case).
+
+t.test(homedata$y1970, conf.level = 0.9)
+t.test(homedata$y2000, conf.level = 0.9)
+```

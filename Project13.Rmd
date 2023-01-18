@@ -1,0 +1,85 @@
+---
+title: "MATH 3070 Lab Project 13"
+author: "Vishwa Murugappan"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+## Problem 1 (Verzani problem 9.14)
+
+*The data set `normtemp` (**UsingR**) contains measurements of 130 healthy, randomly selected individuals. The variable `temperature` contains normal body temperature. Does the data appear to come from a Normal distribution? If so, perform a* $t$-test to see if the commonly assumed value of 98.6 degrees fahrenheit is correct. (Studies have suggested that 98.2 degrees fahrenheit is more accurate.)
+
+```{r, message=FALSE, echo=FALSE}
+require("UsingR")
+```
+
+```{r, tidy = TRUE}
+# Use Q-Q Plot to determine if its appromately normally dsitrbuted
+# Q-Q Plot indicates that temperature variable data is approximately normally distributed
+qqnorm(normtemp$temperature)
+qqline(normtemp$temperature)
+
+# Since data is approximately normally distributed, we can use t test
+t.test(normtemp$temperature, mu = 98.6)
+```
+
+Because p-value is 2.411\*(10\^-7) which is much less than 0.05 (the selected significance level), I reject the null hypothesis in favor of the alternative one.
+
+## Problem 2 (Verzani problem 9.4)
+
+*In the United States in 2007, the proportion of adults age 21-24 who had no medical insurance was 28.1 percent. A survey of 75 recent college graduates in this age range finds that 40 percent are without insurance. Does this support a difference from the nationwide proportion? Perform a test of significance and report the p-value. Is it significant? (Perform this test "by hand", not using `prop.test()`.)*
+
+```{r, tidy = TRUE}
+# Create data
+survey_data = rep(c(0,1),times=c(75*0.4,75*0.6))
+
+# Calculate/State value of variables needed to find z
+p_hat = mean(survey_data)
+p0 = 0.281
+n = 75
+
+# Find Z
+z = (p_hat - p0)/sqrt(p0 * (1 - p0)/n)
+z
+# Calculate pval from z
+pval = 2 * (1 - pnorm(abs(z)))
+pval
+```
+
+Because 7.93823\*(10\^-10) is less than 0.05 (the alpha/threshold value), we can reject the null hypothesis.
+
+## Problem 3 (Verzani problem 9.16)
+
+*A one-sided, one-sample* $t$-test will be performed. What sample size is needed to have a power of 0.80 for a significance level of 0.05 if `delta = 0.05` and the population standard deviation is assumed to be 5?
+
+```{r, tidy = TRUE}
+# Plug in necessary values to power.t.test()
+power.t.test(power = 0.800, delta = 0.05, sd = 5, sig.level = 0.05, type = "one.sample", alternative = "one.sided")
+
+```
+
+61827 samples are needed.
+
+## Problem 4 (Verzani problem 9.31)
+
+*For the `babies` (**UsingR**) data set, the variable `age` contains the recorded mom's age and `dage` contains the dad's age for several cases in the sample. Do a significance test of the null hypothesis of equal ages against a one-sided alternative that the dads are older in the sampled population.*
+
+```{r, tidy = TRUE}
+# Get mothers' and fathers' ages from babies data set
+m_age = babies$age
+d_age = babies$dage
+
+# We can subtract the mother's age data vector from the father's age data vector. t.test()
+# automatically has mu set equal to 0, so the null hypoethesis is set; there is no need to
+# change that parameter. The alternative parameter is set to greater because the
+# alternative hypothesis is that fathers are (signficantly) older than mothers.
+t.test(d_age - m_age, alternative = "greater")
+```
+
+The p-value is less than 2.2\*(10\^-16); it is tiny. This is much less than 0.05 (the selected significance level), so I reject the null hypothesis in favor of the alternative one.

@@ -1,0 +1,141 @@
+---
+title: "MATH 3070 Lab Project 4"
+author: "Vishwa"
+date: "September 21, 2022"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+```{r, include=FALSE}
+usePackage <- function(p) {
+    if (!is.element(p, installed.packages()[,1]))
+        install.packages(p, dep = TRUE)
+    require(p, character.only = TRUE)
+}
+usePackage("UsingR")
+usePackage("MASS")
+
+```
+
+*Remember: I expect to see commentary either in the text, in the code with comments created using `#`, or (preferably) both! **Failing to do so may result in lost points!***
+
+## Problem 1 (Verzani problem 2.43)
+
+*The `time` variable in the `nym.2002` data set (**UsingR**) contains the time to finish the 2002 New York City Marathon for a random sample of the finishers.*
+
+1.  *What percent ran the race in under 3 hours? (note that the data is in minutes)*
+
+2.6 percent of people ran the race in under 3 hours/180 minutes
+
+```{r}
+# We can use the $ symbol to reference a column in an R data frame
+portion_under_minute = which(nym.2002$time/180 < 1)
+no_of_runners = (nym.2002$time)
+# multiply by 100 for percent
+100*length(portion_under_minute)/length(no_of_runners)
+```
+
+2.  *What is the time cutoff for the top 10%? The top 25%?*
+
+The time cutoff for the top 10% is 208.695 minutes. The time cutoff for the top 25% is 233.775 minutes.
+
+```{r}
+# Quantile can be forces to rpovide any percentiles you want by simply adjusting the probs parameter
+quantile(nym.2002$time, probs = seq(.1, .25, by = 0.15))
+```
+
+3.  *What time cuts off the bottom 10%?*
+
+The bottom 10% is cut off by the 331.75 minute mark.
+
+```{r}
+# Readjust probs parameter
+quantile(nym.2002$time, probs = .9)
+```
+
+## Problem 2 (Verzani problem 4.1)
+
+*The data set `UScereal` (**MASS**) contains data on cereals sold in the United States in 1993. For this data set, answer the following questions using R (i.e. MUST answer questions using a code. Do not count by hand):*
+
+1.  *How many rows does the data frame have? Columns?*
+
+There are 65 rows and 11 columns in the UScereal dataframe.
+
+```{r}
+# nrow() and ncol() are R's functions for finding the no. of rows and columns in a dataframe.
+nrow(UScereal)
+ncol(UScereal)
+```
+
+2.  *How many different manufacturers are included?*
+
+6 different manufacturers are included.
+
+```{r}
+# unique will give a list of manufacturers and length will give the no. of them (unique ones)
+length(unique(UScereal$mfr))
+```
+
+3.  *How many vitamin categories are included?*
+
+3 vitamin categories are included.
+
+```{r}
+# Same question as before, but reference the vitamins instread of mfr column now
+length(unique(UScereal$vitamins))
+```
+
+4.  *How many cereals have a sugar level above 10?*
+
+39 cereals have a sugar level above 10.
+
+```{r}
+# Filter the dataset by the value of the sugar column being greater than 10 using which(). Then take the length of that to find the number of cereals with sugar level greater than 10.
+length(which(UScereal$sugars>10))
+```
+
+5.  *What is the mean calorie value for cereals with more than 5 grams of fat? Less than or equal to 5?*
+
+291.8182 and 144.8873 are the mean calorie values for cereals with more than and less than or equal to 5 grams of fat.
+
+```{r}
+# subset will give us a portion of the data frame that meeets a criteria of our choosing
+mean(subset(UScereal, fat > 5)$calories)
+mean(subset(UScereal, fat <= 5)$calories)
+```
+
+6.  *What is the mean calorie value for cereals on the middle shelf (2)?*
+
+The mean calorie value on the middle shelf is 129.8162 calories.
+
+```{r}
+# Same problem as before but filter bu shelf instead of fat now
+mean(subset(UScereal, shelf == 2)$calories)
+```
+
+## Problem 3
+
+*Create a data frame containing the data in the following table:*
+
+The data frame should have 3 columns and 5 rows when it is complete.
+
+| First    | Last      | Age |
+|----------|-----------|-----|
+| Marcus   | Holstein  | 23  |
+| Samuel   | Adams     | 56  |
+| Gus      | McPherson | 43  |
+| Margaret | Olsen     | 41  |
+| Zim      | Newbold   | 95  |
+
+```{r}
+# Create vectors with desired values to add to data frame
+First = c("Marcus","Samuel","Gus","Margaret","Zim")
+Last = c("Holstein","Adams","McPherson","Olsen","Newbold")
+Age = c(23,56,43,41,95)
+
+# Create dataframe from said vectors
+data.frame(First,Last,Age)
+```
